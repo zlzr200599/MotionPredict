@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="huanghao@192.168.1.7:22" autoUploadExternalChanges="true">
+    <serverData>
+      <paths name="huanghao@192.168.1.7:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/huanghao/Lab/MotionPredcit" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>
