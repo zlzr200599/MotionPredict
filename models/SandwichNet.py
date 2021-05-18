@@ -140,10 +140,16 @@ class SandwichNet(nn.Module):
         real_queue = deque()
         for i, (bhg, info) in enumerate(data_loader):
             self.forward(bhg)
-            y_pred = bhg.nodes['agent'].data['predict']
-            y_true = bhg.nodes['agent'].data['state'][:, 20:, :]
+            agent_pred = bhg.nodes['agent'].data['predict']
+            agent_true = bhg.nodes['agent'].data['state'][:, 20:, :]
+            av_pred = bhg.nodes['av'].data['predict']
+            av_true = bhg.nodes['av'].data['state'][:, 20:, :]
+            others_pred = bhg.nodes['others'].data['predict']
+            others_true = bhg.nodes['others'].data['state'][:, 20:, :]
+            y_pred = torch.cat((agent_pred, av_pred, others_pred))
+            y_true = torch.cat((agent_true, av_true, others_true))
 
-            real_lose = torch.square(y_pred - y_true).flatten().view(-1, 2)
+            real_lose = torch.square(agent_pred - agent_true).flatten().view(-1, 2)
             real_lose = torch.sum(real_lose, dim=1)
             real_lose = torch.sqrt(real_lose)
             real_lose = torch.mean(real_lose)
