@@ -157,7 +157,7 @@ def make_model(n_layer=1, d_model=4, d_ff=64, n_head=2, dropout=0.1):
 
 
 if __name__ == "__main__":
-    m = make_model(n_layer=5, d_model=9, d_ff=64, n_head=3, dropout=0.5)
+    m = make_model(n_layer=5, d_model=9, d_ff=64, n_head=3, dropout=0.0)
     mask = torch.ByteTensor([[1,1,1,1,1],[1,1,1,1,1],[1,1,1,0,0]])
     src = torch.rand(3, 5, 9)
     out1 = m(src, mask=mask)
