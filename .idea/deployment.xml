@@ -5,8 +5,11 @@
       <paths name="huanghao@192.168.1.7:22">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/huanghao/Lab/MotionPredcit" local="$PROJECT_DIR$" />
+            <mapping deploy="/Lab/MotionPredict" local="$PROJECT_DIR$" />
           </mappings>
+          <excludedPaths>
+            <excludedPath path="/Lab/MotionPredict/dataset" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>

@@ -243,9 +243,9 @@ class AllDataset:
         self.test = MyDataset(raw_dir=test_dir, fraction=test_fraction, mode='test')
 
 if __name__ == "__main__":
-    raw_dir = './dataset/train_1k'
-    raw_dir = './dataset/train_1h'
-    dataset = MyDataset(raw_dir=raw_dir, fraction=1.01, save_dir='./tmp/any.my')
+    raw_dir = './dataset/train/train_1k'
+    raw_dir = './dataset/train/train_1h'
+    dataset = MyDataset(raw_dir=raw_dir, fraction=1.01, save_dir='./dataset/tmp/any.my')
     start_time = time.time()
     data_loader = GraphDataLoader(dataset, collate_fn=collate, batch_size=16, shuffle=False, drop_last=True)
     start = time.time()
@@ -255,4 +255,4 @@ if __name__ == "__main__":
             print(f"{i} | {time.time() - start_time:6.2f} s")
         print(f"current time: {time.time()-start:6.2f} s")
     print(dataset.cache_size)
-    dataset.clear_cache()
+    # dataset.clear_cache()
