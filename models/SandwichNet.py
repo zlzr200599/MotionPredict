@@ -64,7 +64,7 @@ class SandwichNet(nn.Module):
         mask = [[int(i < len(_s)) for i in range(max_len)] for _s in all_tensor]
         mask = torch.BoolTensor(mask)
         # print("mask\t",mask)
-        padded_tensor = self.self_att(padded_tensor.transpose(0, 1), mask=mask)
+        padded_tensor = self.self_att(padded_tensor.transpose(0, 1), mask=mask) + padded_tensor.transpose(0, 1)
         # print("padded tenser shape\t", padded_tensor.shape)
         # print("all lens\t", all_lens)
         SandwichNet.padded_to_graph(pad_tensor=padded_tensor, all_len=all_lens, g=g)
@@ -101,7 +101,16 @@ class SandwichNet(nn.Module):
                 y_pred = bhg.nodes['agent'].data['predict']
                 y_true = bhg.nodes['agent'].data['state'][:, 20:, :]
 
-                loss = criterion(y_pred, y_true)
+                x_pred = bhg.nodes['av'].data['predict'] * bhg.nodes['av'].data['mask'][:, 20:, :]
+                x_true = bhg.nodes['av'].data['state'][:, 20:, :]
+                # print(float(bhg.nodes['av'].data['mask'][:, 20:, :].mean()))
+
+                z_pred = bhg.nodes['others'].data['predict'] * bhg.nodes['others'].data['mask'][:, 20:, :]
+                z_true = bhg.nodes['others'].data['state'][:, 20:, :]
+                # print(float(bhg.nodes['others'].data['mask'][:, 20:, :].mean()))
+                pred, true = torch.cat((y_pred, x_pred, z_pred)),torch.cat((y_true, x_true, z_true)),
+                # loss = criterion(y_pred, y_true)
+                loss = criterion(pred, true)
                 loss.backward()
                 optimizer.step()
 
@@ -142,12 +151,6 @@ class SandwichNet(nn.Module):
             self.forward(bhg)
             agent_pred = bhg.nodes['agent'].data['predict']
             agent_true = bhg.nodes['agent'].data['state'][:, 20:, :]
-            av_pred = bhg.nodes['av'].data['predict']
-            av_true = bhg.nodes['av'].data['state'][:, 20:, :]
-            others_pred = bhg.nodes['others'].data['predict']
-            others_true = bhg.nodes['others'].data['state'][:, 20:, :]
-            y_pred = torch.cat((agent_pred, av_pred, others_pred))
-            y_true = torch.cat((agent_true, av_true, others_true))
 
             real_lose = torch.square(agent_pred - agent_true).flatten().view(-1, 2)
             real_lose = torch.sum(real_lose, dim=1)
