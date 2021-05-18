@@ -161,4 +161,5 @@ if __name__ == "__main__":
     mask = torch.ByteTensor([[1,1,1,1,1],[1,1,1,1,1],[1,1,1,0,0]])
     src = torch.rand(3, 5, 9)
     out1 = m(src, mask=mask)
-    out2 = m(src)
+    print(out1.shape)
+
