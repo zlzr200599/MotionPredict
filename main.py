@@ -22,8 +22,9 @@ if __name__ == "__main__":
                         de_layers=2,output_size=2,
                         saved_path='new_20210519_0000.pth'
                         )
-    model.train_model(dataset=data, batch_size=8, shuffle=True,
-                      n_epoch=100, lr=0.02,
-                      )
+    # model.train_model(dataset=data, batch_size=8, shuffle=True,
+    #                   n_epoch=100, lr=0.02,
+    #                   )
     # model.val_model(dataset=data, return_to_plot=True)
     # model.test_model(dataset=data, output_dir="./test_result_0519_01/")
+    model.test_all(dataset=data, output_dir="./test_result_0519_01/")

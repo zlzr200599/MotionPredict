@@ -17,6 +17,8 @@ from typing import List, Union, Tuple, Callable, Dict
 from dgl.data import DGLDataset
 from functools import lru_cache
 from anycache import anycache, AnyCache
+from utils import tensor_to_str, str_to_tensor
+
 
 argo_map = ArgoverseMap()
 argo_center_lines = argo_map.city_lane_centerlines_dict
@@ -46,29 +48,38 @@ def dict_to_graph(input_dict: Dict):
     start_time = input_dict['start_time']
     time_dict = input_dict['time_dict']
     n_avs, n_others, n_lanes = len(input_dict['av']), len(input_dict['others']), len(input_dict['lanes'])
-
+    # init AGENT----------------------------------------------------------------------
+    agent_tracks_id = np.zeros((n_avs, 50), np.int)
+    agent_tracks_id[0, :] = str_to_tensor(input_dict['agent_track_id'])
+    # init AV -------------------------------------------------------------------------
     av_tracks = np.zeros((n_avs, 50, 2), np.float)
     av_tracks_len = np.zeros((n_avs, 2), np.int)
     av_tracks_mask = np.zeros((n_avs, 50, 2), np.int)
-    for idx, t_array in enumerate(input_dict['av'].values()):
+    av_tracks_id = np.zeros((n_avs, 50), np.int)
+    for idx, (track_id ,t_array) in enumerate(input_dict['av'].items()):
         t_start = t_array[0, 0]
         i_start = time_dict[t_start]
         av_tracks[idx, i_start: i_start+len(t_array), :] = t_array[:, 1:]  - center
         av_tracks_len[idx, :] = np.array([i_start, i_start + len(t_array)], dtype=np.int)
         av_tracks_mask[idx, i_start: i_start+len(t_array), :] = np.zeros_like(t_array[:, 1:])
+        av_tracks_id[idx, :] = str_to_tensor(track_id)
+    # init OTHERS -------------------------------------------------------------------------
     other_tracks = np.zeros((n_others, 50, 2), np.float)
     other_tracks_len = np.zeros((n_others, 2), np.int)
     other_tracks_mask = np.zeros((n_others, 50, 2), np.int)
-    for idx, t_array in enumerate(input_dict['others'].values()):
+    other_tracks_id = np.zeros((n_others, 50), np.int)
+    for idx, (track_id, t_array) in enumerate(input_dict['others'].items()):
         t_start = t_array[0, 0]
         i_start = time_dict[t_start]
         other_tracks[idx, i_start: i_start + len(t_array), :] = t_array[:, 1:] - center
         other_tracks_len[idx, :] = np.array([i_start, i_start + len(t_array)], dtype=np.int)
         other_tracks_mask[idx, i_start: i_start + len(t_array), :] = np.ones_like(t_array[:, 1:])
+        other_tracks_id[idx,:] = str_to_tensor(track_id)
+    # init LANES -------------------------------------------------------------------------
     lane_lines = np.zeros((n_lanes, 10, 2), np.float)
     for idx, t_array in input_dict['lanes'].items():
         lane_lines[idx, :, :] = t_array - center
-
+    # DEFINE GRAPH------------------------------------------------------------------------
     graph = dgl.heterograph({
         ('agent', 'agent_env', 'env'): ([0], [0]),
         # ('env', 'env_agent', 'agent'): ([0], [0]),
@@ -81,14 +92,20 @@ def dict_to_graph(input_dict: Dict):
 
         ('lane', 'lane_env', 'env'): (list(range(n_lanes)), [0]*n_lanes),
     })
-
+    # ASSIGN GRAPH VALUE---------------------------------------------------------
     graph.nodes['agent'].data['state'] = th.tensor(agent_track, dtype=th.float).unsqueeze(dim=0)
+    graph.nodes['agent'].data['track_id'] = th.tensor(agent_tracks_id, dtype=th.int)
+
     graph.nodes['av'].data['state'] = th.tensor(av_tracks, dtype=th.float)
-    graph.nodes['av'].data['len'] = th.tensor(av_tracks_len, dtype=th.float)
+    graph.nodes['av'].data['len'] = th.tensor(av_tracks_len, dtype=th.int)
     graph.nodes['av'].data['mask'] = th.tensor(av_tracks_mask, dtype=th.float)
+    graph.nodes['av'].data['track_id'] = th.tensor(av_tracks_id, dtype=th.int)
+
     graph.nodes['others'].data['state'] = th.tensor(other_tracks, dtype=th.float)
-    graph.nodes['others'].data['len'] = th.tensor(other_tracks_len, dtype=th.float)
+    graph.nodes['others'].data['len'] = th.tensor(other_tracks_len, dtype=th.int)
     graph.nodes['others'].data['mask'] = th.tensor(other_tracks_mask, dtype=th.float)
+    graph.nodes['others'].data['track_id'] = th.tensor(other_tracks_id, dtype=th.float)
+
     graph.nodes['lane'].data['state'] = th.tensor(lane_lines, dtype=th.float)
 
     return graph
@@ -260,4 +277,4 @@ if __name__ == "__main__":
             print(f"{i} | {time.time() - start_time:6.2f} s")
         print(f"current time: {time.time()-start:6.2f} s")
     print(dataset.cache_size)
-    # dataset.clear_cache()
+    dataset.clear_cache()

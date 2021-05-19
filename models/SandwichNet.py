@@ -10,7 +10,7 @@ from torch.nn.utils.rnn import pad_sequence
 import dgl
 from dgl.dataloading import GraphDataLoader
 from torch.optim.lr_scheduler import LambdaLR
-from utils import val_plot
+from utils import val_plot, graph_and_info_to_df_list
 import pandas as pd
 import numpy as np
 from collections import deque
@@ -203,6 +203,29 @@ class SandwichNet(nn.Module):
         self.train()
         print(f"test time is :{time.time() - start_time:6.2f} s | num_samples : {len(dataset.test)}")
 
+    @torch.no_grad()
+    def test_all(self, dataset: AllDataset, output_dir: str = "test_result"):
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            print(f"make new dir {os.path.abspath(output_dir)}, and write files into it.")
+        else:
+            print(f'output dir {os.path.abspath(output_dir)} exists !')
+        # todo
+        # self.load()
+        self.eval()
+        data_loader = GraphDataLoader(dataset.test, collate_fn=collate, batch_size=10,
+                                      shuffle=False, drop_last=False)
+        start_time = time.time()
+        for i, (bhg, info) in enumerate(data_loader):
+            batch_size = len(info)
+            self.forward(bhg)
+            for idi, (cg, cd) in enumerate(zip(dgl.unbatch(bhg), info)):
+                track_pd_list = graph_and_info_to_df_list(cg, cd)
+                # pd.set_option('display.max_columns', 10000)
+                # print(track_pd_list[0])
+        #     todo
+        self.train()
+        print(f"test time is :{time.time() - start_time:6.2f} s | num_samples : {len(dataset.test)}")
 
     def save(self):
         torch.save(self.state_dict(), self.saved_path)
