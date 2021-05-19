@@ -233,14 +233,19 @@ class AllDataset:
     def __init__(self,
                  train_dir=None,
                  train_fraction=1.0,
+                 train_saved=None,
+
                  val_dir=None,
                  val_fraction=1.0,
+                 val_saved=None,
+
                  test_dir=None,
                  test_fraction=1.0,
+                 test_saved=None,
                  ):
-        self.train = MyDataset(raw_dir=train_dir, fraction=train_fraction, mode='train')
-        self.val = MyDataset(raw_dir=val_dir, fraction=val_fraction, mode='val')
-        self.test = MyDataset(raw_dir=test_dir, fraction=test_fraction, mode='test')
+        self.train = MyDataset(raw_dir=train_dir, fraction=train_fraction, mode='train', save_dir=train_saved)
+        self.val = MyDataset(raw_dir=val_dir, fraction=val_fraction, mode='val', save_dir=val_saved)
+        self.test = MyDataset(raw_dir=test_dir, fraction=test_fraction, mode='test', save_dir=test_saved)
 
 if __name__ == "__main__":
     raw_dir = './dataset/train/train_1k'

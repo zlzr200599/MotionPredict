@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
-
+import math
+import torch
 
 def batch_change_name(old_dir, new_dir):
     """
@@ -51,3 +52,31 @@ def plot_bhg(bhg, plot_predict=False):
     if plot_predict:
         plt.plot(predict_track[:, 1], predict_track[:, 2], 'y.')
     plt.show()
+
+
+def str_to_tensor(input_str: str) -> torch.IntTensor:
+    """
+    >>> input_str = '00000000-0000-0000-0000-000000147400'
+    >>> str_to_tensor(input_str)
+    tensor([48, 48, 48, 48, 48, 48, 48, 48, 45, 48, 48, 48, 48, 45, 48, 48, 48, 48,
+    45, 48, 48, 48, 48, 45, 48, 48, 48, 48, 48, 48, 49, 52, 55, 52, 48, 48],
+    dtype=torch.int32)
+    """
+    return torch.IntTensor([ord(c) for c in input_str])
+
+
+def tensor_to_str(int_tensor: torch.IntTensor) -> str:
+    """
+
+    input_tensor = tensor([48, 48, 48, 48, 48, 48, 48, 48, 45, 48, 48, 48, 48, 45, 48, 48, 48, 48,
+        45, 48, 48, 48, 48, 45, 48, 48, 48, 48, 48, 48, 49, 52, 55, 52, 48, 48],
+        dtype=torch.int32)
+    >>> tensor_to_str(input_tensor)
+    '00000000-0000-0000-0000-000000147400'
+    """
+    char_ord_list = int_tensor.tolist()
+    return "".join([chr(int(i)) for i in char_ord_list])
+
+
+if __name__ == "__main__":
+    pass
