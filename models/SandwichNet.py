@@ -25,6 +25,7 @@ class SandwichNet(nn.Module):
                  ):
         super(SandwichNet, self).__init__()
         self.saved_path = saved_path
+        self.training = False
         self.lstm_encoder = LSTMEncoder(input_size=input_size, hidden_size=en_hidden_size,output_size=att_size,
                                         num_layers=en_layers, dropout=dropout)
         self.self_att: Encoder = make_model(n_layer=att_layers, d_model=att_size, d_ff=d_ff,

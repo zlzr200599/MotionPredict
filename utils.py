@@ -36,6 +36,7 @@ def val_plot(bhg):
     plt.plot(agent[:20, 0], agent[:20, 1], 'go')
     plt.plot(agent[20:, 0], agent[20:, 1], 'b.')
     plt.plot(predict_track[:, 0], predict_track[:, 1], 'y.')
+    print(predict_track)
     plt.show()
 
 
