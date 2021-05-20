@@ -183,6 +183,7 @@ class SandwichNet(nn.Module):
             self.forward(bhg)
             y_pred: torch.FloatTensor = bhg.nodes['agent'].data['predict']
             assert batch_size == y_pred.shape[0]
+            print(f"\rprocessed {i+1}/{len(data_loader)} ", end="")
             for n, d in enumerate(info):
                 st = float(d['split_time'])
                 x, y = d['radix']['x'], d['radix']['y']
@@ -196,11 +197,13 @@ class SandwichNet(nn.Module):
                                        columns=("TIMESTAMP", "TRACK_ID", "OBJECT_TYPE", "X", "Y", "CITY_NAME")
                                        )
                 stack_df = pd.concat(objs=[d['df'], this_df])
-
+                # select the 京东 agent object
+                stack_df = stack_df[stack_df["OBJECT_TYPE"] == "AGENT"]
                 stack_df.to_csv(os.path.join(output_dir, d['filename']+".csv"), index=False)
 
                 # pd.set_option('display.max_columns', 1000)
                 # print(this_df)
+
         self.train()
         print(f"test time is :{time.time() - start_time:6.2f} s | num_samples : {len(dataset.test)}")
 
@@ -211,20 +214,24 @@ class SandwichNet(nn.Module):
             print(f"make new dir {os.path.abspath(output_dir)}, and write files into it.")
         else:
             print(f'output dir {os.path.abspath(output_dir)} exists !')
-        # todo
-        # self.load()
+        self.load()
         self.eval()
         data_loader = GraphDataLoader(dataset.test, collate_fn=collate, batch_size=10,
                                       shuffle=False, drop_last=False)
         start_time = time.time()
+        file_name_index = 1
         for i, (bhg, info) in enumerate(data_loader):
             batch_size = len(info)
             self.forward(bhg)
             for idi, (cg, cd) in enumerate(zip(dgl.unbatch(bhg), info)):
                 track_pd_list = graph_and_info_to_df_list(cg, cd)
+                # todo
                 # pd.set_option('display.max_columns', 10000)
                 # print(track_pd_list[0])
-        #     todo
+                for i_df, df in enumerate(track_pd_list):
+                    df.to_csv(os.path.join(output_dir, str(file_name_index) + ".csv"), index=False)
+                    file_name_index += 1
+
         self.train()
         print(f"test time is :{time.time() - start_time:6.2f} s | num_samples : {len(dataset.test)}")
 

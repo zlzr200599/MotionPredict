@@ -6,12 +6,14 @@ if __name__ == "__main__":
 
     warnings.filterwarnings("ignore")
     train_dir = './dataset/train/train_10k'
+    train_dir = '/home/huanghao/Lab/argodataset/train/data'
     test_dir = './dataset/test/test_2k'
+    test_dir = './dataset/test/test_all'
 
     data = AllDataset(train_dir=train_dir,
                       train_fraction=1.,
                       val_dir='/home/huanghao/Lab/argodataset/val/data',
-                      val_fraction=5000/39472,  # 39472
+                      val_fraction=500/39472,  # 39472
                       test_dir=test_dir,
                       test_fraction=1.,
                       )
@@ -22,9 +24,9 @@ if __name__ == "__main__":
                         de_layers=2,output_size=2,
                         saved_path='new_20210519_0000.pth'
                         )
-    # model.train_model(dataset=data, batch_size=8, shuffle=True,
-    #                   n_epoch=100, lr=0.02,
+    # model.train_model(dataset=data, batch_size=16, shuffle=True,
+    #                   n_epoch=30, lr=0.02,
     #                   )
-    model.val_model(dataset=data, return_to_plot=False)
-    # model.test_model(dataset=data, output_dir="./test_result_0519_01/")
-    # model.test_all(dataset=data, output_dir="./test_result_0519_01/")
+    # model.val_model(dataset=data, return_to_plot=False)
+    model.test_model(dataset=data, output_dir="./eval_ai_result/")
+    # model.test_all(dataset=data, output_dir="./test_result_all_agent_0520/")

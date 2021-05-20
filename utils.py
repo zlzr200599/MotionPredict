@@ -6,6 +6,9 @@ import numpy as np
 import pandas as pd
 import dgl
 from typing import List
+from argoverse.data_loading.argoverse_forecasting_loader import ArgoverseForecastingLoader
+from argoverse.evaluation.competition_util import generate_forecasting_h5
+
 
 def batch_change_name(old_dir, new_dir):
     """
@@ -78,7 +81,7 @@ def tensor_to_str(int_tensor: np.ndarray, padding='$') -> str:
     return "".join([chr(int(i)) for i in ord_list]).strip(padding)
 
 
-def graph_and_info_to_df_list(g: dgl.DGLGraph, d: dict) -> List[pd.DataFrame]:
+def graph_and_info_to_df_list(g: dgl.DGLGraph, d: dict, ) -> List[pd.DataFrame]:
     df_list = []
     x, y = d['radix']['x'], d['radix']['y']
     center = np.array([x, y])
@@ -92,7 +95,7 @@ def graph_and_info_to_df_list(g: dgl.DGLGraph, d: dict) -> List[pd.DataFrame]:
     assert len(xy) == 50
     df_list.append(six_in_df(times, track_id, 'AGENT', xy, city))
 
-    av_traj = torch.cat((g.nodes['av'].data["state"][:,:20,:], g.nodes['av'].data["predict"]), 1) + center
+    av_traj = torch.cat((g.nodes['av'].data["state"][:, :20, :], g.nodes['av'].data["predict"]), 1) + center
     track_id = g.nodes['av'].data['track_id']
     le = g.nodes['av'].data['len']
     for i, (tr, ti, n) in enumerate(zip(av_traj, track_id, le)):
@@ -100,7 +103,7 @@ def graph_and_info_to_df_list(g: dgl.DGLGraph, d: dict) -> List[pd.DataFrame]:
             ti = tensor_to_str(ti)
             df_list.append(six_in_df(times, ti, "AV", tr, city)[int(n[0]):])
 
-    o_traj = torch.cat((g.nodes['others'].data["state"][:,:20,:], g.nodes['others'].data["predict"]), 1) + center
+    o_traj = torch.cat((g.nodes['others'].data["state"][:, :20, :], g.nodes['others'].data["predict"]), 1) + center
     track_id = g.nodes['others'].data['track_id']
     le = g.nodes['others'].data['len']
     for i, (tr, ti, n) in enumerate(zip(o_traj, track_id, le)):
@@ -112,13 +115,36 @@ def graph_and_info_to_df_list(g: dgl.DGLGraph, d: dict) -> List[pd.DataFrame]:
 
 def six_in_df(timestamp, track_id: str, object_type: str, xy, city_name: str):
     n_rows = len(timestamp)
-    timestamp, track_id, object_type, x, y, city_name = pd.Series(timestamp), pd.Series([track_id]*n_rows), \
-                                                        pd.Series([object_type]*n_rows), pd.Series(xy[:, 0]), \
-                                                        pd.Series(xy[:, 1]), pd.Series([city_name]*n_rows)
+    timestamp, track_id, object_type, x, y, city_name = pd.Series(timestamp), pd.Series([track_id] * n_rows), \
+                                                        pd.Series([object_type] * n_rows), pd.Series(xy[:, 0]), \
+                                                        pd.Series(xy[:, 1]), pd.Series([city_name] * n_rows)
 
     return pd.DataFrame(list(zip(timestamp, track_id, object_type, x, y, city_name)),
                         columns=["TIMESTAMP", "TRACK_ID", "OBJECT_TYPE", "X", "Y", "CITY_NAME"])
 
 
+def converter_csv_to_argo(input_path: str, output_path: str):
+    afl = ArgoverseForecastingLoader(input_path)
+    output_all = {}
+    counter = 1
+    for data in afl:
+        print('\r' + str(counter) + '/' + str(len(afl)), end="")
+        seq_id = int(data.current_seq.name[:-4])
+        output_all[seq_id] = np.expand_dims(data.agent_traj[20:, :], 0)
+        counter += 1
+    generate_forecasting_h5(output_all, output_path)  # this might take awhile
+
+
 if __name__ == "__main__":
-    pass
+    # batch_change_name('./test_result_self_0520', './test_result_self_0520_sorted')
+    converter_csv_to_argo(input_path="./eval_ai_result/",
+                          output_path="./eval_ai_h5/")
+
+    # afl = ArgoverseForecastingLoader('/home/huanghao/Lab/argodataset/train/data')
+    # c = 0
+    # for data in afl:
+    #     if len(data.agent_traj) < 50:
+    #         print(data.current_seq)
+    #         # raise  Exception
+    #     print(f"\r{c}/{len(afl)} {c}", end='')
+    #     c += 1

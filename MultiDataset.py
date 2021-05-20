@@ -146,6 +146,7 @@ class MyDataset(DGLDataset, ABC):
                  verbose=False,
                  fraction=1.0,
                  mode="train",
+                 mem_cache=25000,
                  ):
         super(MyDataset, self).__init__(name='dataset_name',
                                         url=url,
@@ -157,7 +158,10 @@ class MyDataset(DGLDataset, ABC):
         self.argo_loader = ArgoverseForecastingLoader(raw_dir)
         self.fraction = fraction if fraction <= 1.0 else 1.0
         self.mode = mode
-
+        if self.mode == 'test':
+            self.mem_cache = 0
+        else:
+            self.mem_cache = mem_cache
     def download(self):
         # download raw data to local disk
         pass
@@ -166,9 +170,10 @@ class MyDataset(DGLDataset, ABC):
         # process raw data to graphs, labels, splitting masks
         pass
 
-    @lru_cache(maxsize=250000)
+
     def __getitem__(self, idx):
         # get one example by index
+        @lru_cache(maxsize=self.mem_cache)
         @self.ac.anycache()
         def idx_to_graph(sample_id: int):
             my_dict = {}
