@@ -135,6 +135,7 @@ class SandwichNet(nn.Module):
                   f"estimate time remain: {(n_epoch - epoch) * (time.time() - start_time)/(epoch+1):8.2f} s")
             print("-------------------------------------------------------------------------------------------")
             print(f"total time: {time.time() - start_time:6.2f} s")
+            self.save()
         self.save()
         self.training = False
 
