@@ -5,7 +5,6 @@ from models.SandwichNet import SandwichNet
 if __name__ == "__main__":
 
     warnings.filterwarnings("ignore")
-    train_dir = './dataset/train/train_10k'
     train_dir = '/home/huanghao/Lab/argodataset/train/data'
     test_dir = './dataset/test/test_2k'
     test_dir = './dataset/test/test_all'
@@ -37,7 +36,7 @@ if __name__ == "__main__":
     # model 0522  5000 loss x
     model = SandwichNet(input_size=2,
                         en_layers=1, en_hidden_size=16,
-                        att_layers=3, att_size=16, d_ff=128, n_head=8,
+                        att_layers=3, att_size=64, d_ff=64, n_head=8,
                         de_layers=2, output_size=2,
                         saved_path='new_20210522.pth'
                         )
