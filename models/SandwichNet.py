@@ -150,6 +150,7 @@ class SandwichNet(nn.Module):
         start_time = time.time()
         real_queue = deque()
         for i, (bhg, info) in enumerate(data_loader):
+            print(f"\r {i+1}/{len(data_loader)} | elapse time: {time.time() - start_time}", end="")
             self.forward(bhg)
             agent_pred = bhg.nodes['agent'].data['predict']
             agent_true = bhg.nodes['agent'].data['state'][:, 20:, :]

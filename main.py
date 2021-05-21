@@ -11,24 +11,35 @@ if __name__ == "__main__":
     test_dir = './dataset/test/test_all'
 
     data = AllDataset(train_dir=train_dir,
-                      train_fraction=0.25,
+                      train_fraction=0.5,
                       val_dir='/home/huanghao/Lab/argodataset/val/data',
-                      val_fraction=500/39472,  # 39472
+                      val_fraction=5000/39472,  # 39472
                       test_dir=test_dir,
                       test_fraction=1.,
                       )
 
+    # # model 0520  5000 loss : 2.5847 m
     # model = SandwichNet(input_size=2,
     #                     en_layers=2, en_hidden_size=32,
     #                     att_layers=2, att_size=64, d_ff=32, n_head=4,
     #                     de_layers=2,output_size=2,
     #                     saved_path='new_20210519_0000.pth'
     #                     )
+
+    # # model 0521  5000 loss : 2.4547 m
+    # model = SandwichNet(input_size=2,
+    #                     en_layers=2, en_hidden_size=16,
+    #                     att_layers=2, att_size=32, d_ff=64, n_head=8,
+    #                     de_layers=2,output_size=2,
+    #                     saved_path='new_20210521.pth'
+    #                     )
+
+    # model 0522  5000 loss x
     model = SandwichNet(input_size=2,
-                        en_layers=2, en_hidden_size=16,
-                        att_layers=2, att_size=32, d_ff=64, n_head=8,
-                        de_layers=2,output_size=2,
-                        saved_path='new_20210521.pth'
+                        en_layers=1, en_hidden_size=16,
+                        att_layers=3, att_size=16, d_ff=128, n_head=8,
+                        de_layers=2, output_size=2,
+                        saved_path='new_20210522.pth'
                         )
 
     model.train_model(dataset=data, batch_size=16, shuffle=True,
