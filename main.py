@@ -6,7 +6,7 @@ if __name__ == "__main__":
     warnings.filterwarnings("ignore")
 
     train_dir = '/home/huanghao/Lab/argodataset/train/data'
-    test_dir = './dataset/test/test_2k'
+    # test_dir = './dataset/test/test_2k'
     test_dir = './dataset/test/test_all'
 
     data = AllDataset(train_dir=train_dir,
@@ -36,6 +36,6 @@ if __name__ == "__main__":
     # model.train_model(dataset=data, batch_size=16, shuffle=True,
     #                   n_epoch=30, lr=0.001,
     #                   )
-    model.val_model(dataset=data, return_to_plot=False)
-    # model.test_model(dataset=data, output_dir="./eval_ai_result/")
+    # model.val_model(dataset=data, return_to_plot=False)
+    model.test_model(dataset=data, output_dir="./JD_ALL_result/")
     # model.test_all(dataset=data, output_dir="./test_result_all_agent_0520/")
