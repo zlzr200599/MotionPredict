@@ -136,10 +136,10 @@ def converter_csv_to_argo(input_path: str, output_path: str):
 
 
 if __name__ == "__main__":
-    # batch_change_name('./test_result_self_0520', './test_result_self_0520_sorted')
+    batch_change_name('./test_output', './test_jd')
 
-    converter_csv_to_argo(input_path="./eval_ai_result/",
-                          output_path="./eval_ai_h5/")
+    # converter_csv_to_argo(input_path="./eval_ai_result/",
+    #                       output_path="./eval_ai_h5/")
 
     # afl = ArgoverseForecastingLoader('/home/huanghao/Lab/argodataset/train/data')
     # c = 0
