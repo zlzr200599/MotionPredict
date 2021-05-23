@@ -1,6 +1,6 @@
 anycache==2.0.7
 argon2-cffi==20.1.0
-argoverse==1.0.0
+-e git+https://github.com.cnpmjs.org/argoai/argoverse-api.git@9ad7251e863590603c3f6064a45830dabd3a15e2#egg=argoverse
 async-generator==1.10
 attrs==21.2.0
 backcall==0.2.0
