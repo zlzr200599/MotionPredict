@@ -1,2 +1,17 @@
 # pip freeze > requirements.txt
 pip install -r requirements.txt
+
+
+DESCRIPTION
+    python run.py --traindir /your_train_data/ --valdir /your_val_data/  --testdir /your_test_data/  --train  --test
+
+SYNOPSIS
+    --traindir   train dataset path
+    --valdir     val dataset path
+    --testdir    test dataset path
+    --train      train mode
+    --test       test mode
+
+PRECAUTION
+    In either test or train mode, you should explicitly input all three parts(train, val and test) of the dataset
+    with corresponding command options.
